@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.env
+venv/
+osinthawk_*.json
+*.log
+.DS_Store

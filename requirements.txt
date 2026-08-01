@@ -1,0 +1,4 @@
+# OsintHawk uses only Python stdlib — no pip install needed!
+# Optional enhancements:
+requests>=2.31.0
+dnspython>=2.4.0

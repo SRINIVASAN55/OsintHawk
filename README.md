@@ -1,5 +1,9 @@
 # OsintHawk
 
+![CI](https://github.com/SRINIVASAN55/OsintHawk/actions/workflows/ci.yml/badge.svg) ![License: MIT](https://img.shields.io/badge/License-MIT-green.svg) ![Python](https://img.shields.io/badge/python-3.8+-blue.svg)
+
+
+
 > "Give me a domain. I'll give you its attack surface."
 
 OsintHawk is an open-source intelligence gathering tool that aggregates public data across DNS, subdomains, WHOIS, certificate transparency logs, email breach databases, and more — building a structured recon profile from a single domain name.

@@ -1,90 +1,75 @@
-<div align="center">
+# OsintHawk
 
-```
-  ██████╗ ███████╗██╗███╗  ██╗████████╗██╗  ██╗ █████╗ ██╗    ██╗██╗  ██╗
- ██╔═══██╗██╔════╝██║████╗ ██║╚══██╔══╝██║  ██║██╔══██╗██║    ██║██║ ██╔╝
- ██║   ██║███████╗██║██╔██╗██║   ██║   ███████║███████║██║ █╗ ██║█████╔╝ 
- ██║   ██║╚════██║██║██║╚████║   ██║   ██╔══██║██╔══██║██║███╗██║██╔═██╗ 
- ╚██████╔╝███████║██║██║ ╚███║   ██║   ██║  ██║██║  ██║╚███╔███╔╝██║  ██╗
-  ╚═════╝ ╚══════╝╚═╝╚═╝  ╚══╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝ ╚══╝╚══╝ ╚═╝  ╚═╝
-```
+> "Give me a username. I'll give you a person."
 
-**🦅 Automated OSINT Reconnaissance Framework**
-
-[![Python](https://img.shields.io/badge/Python_3.8+-orange?style=flat-square&logo=python&logoColor=white)](https://python.org)
-[![Modules](https://img.shields.io/badge/7_Recon_Modules-FF8C00?style=flat-square)]()
-[![Zero_Deps](https://img.shields.io/badge/Zero_Dependencies-stdlib_only-success?style=flat-square)]()
-[![License](https://img.shields.io/badge/MIT-gray?style=flat-square)](LICENSE)
-
-*Hunt from the sky. See everything. Leave no trace.*
-
-</div>
+OsintHawk is an open-source intelligence gathering tool that aggregates public data across platforms — social media, DNS records, email breach databases, WHOIS, certificate transparency logs — and builds a structured profile from a single starting point: a username, email, domain, or IP.
 
 ---
 
-## 🎯 Mission
+## Starting points
 
-OsintHawk is a single-file OSINT reconnaissance tool that chains 7 intelligence-gathering modules into one clean CLI workflow. No API keys required for core features. No pip install needed.
-
-```
-$ python osinthawk.py -d target.com
-
-[whois]      → Registrar, creation date, expiry, nameservers
-[dns]        → A, AAAA, MX, NS, TXT, CNAME, SOA records  
-[subdomains] → 75-word multithreaded brute-force → 12 live found
-[ip]         → IP: 93.184.216.34 | US | Edgecast | AS15133
-[ports]      → 80/HTTP ✓  443/HTTPS ✓  22/SSH ✗  3306 ✗
-[emails]     → Found via crt.sh: admin@target.com
-[tech]       → Nginx 1.24, Cloudflare, React
-```
+| Input | What OsintHawk finds |
+|-------|----------------------|
+| Username | Matching accounts across 50+ platforms, profile metadata, activity patterns |
+| Email | Breach history, associated accounts, domain ownership, MX records |
+| Domain | WHOIS, DNS records, subdomains, SSL cert history, linked IPs, tech stack |
+| IP | ASN, geolocation, reverse DNS, open ports, hosting provider, abuse reports |
+| Phone | Country/carrier, linked accounts (where public), formatting variants |
 
 ---
 
-## 🚀 One-Line Start
+## How it works
+
+OsintHawk doesn't scrape. It queries APIs and public records that are meant to be queried — DNS resolvers, WHOIS servers, certificate transparency logs (crt.sh), HaveIBeenPwned, Shodan (with key), and platform-specific public endpoints.
+
+Results are correlated. If a username appears on GitHub and a matching email appears in a breach, OsintHawk links them in the output graph.
+
+---
+
+## Usage
 
 ```bash
-git clone https://github.com/SRINIVASAN55/OsintHawk && cd OsintHawk
+git clone https://github.com/SRINIVASAN55/OsintHawk
+cd OsintHawk
+pip install -r requirements.txt
 
-python osinthawk.py -d example.com                   # Full recon
-python osinthawk.py -d example.com -m whois dns      # Pick modules
-python osinthawk.py -d example.com -t 100 -o out.json # 100 threads, save JSON
+# Investigate a username
+python osinthawk.py --username johndoe
+
+# Investigate a domain
+python osinthawk.py --domain example.com
+
+# Investigate an email
+python osinthawk.py --email user@example.com
+
+# Full report (all modules) → HTML output
+python osinthawk.py --target johndoe --full --report
 ```
 
 ---
 
-## 🧩 Module Map
+## Sample output
 
 ```
-OsintHawk
-├── whois       ── Socket-based WHOIS via whois.iana.org
-├── dns         ── dig fallback → socket for A records  
-├── subdomains  ── ThreadPoolExecutor, 75-word wordlist
-├── ip          ── ip-api.com: geo, ISP, ASN, timezone
-├── ports       ── 20 common ports, 1.5s timeout each
-├── emails      ── Certificate Transparency via crt.sh
-└── tech        ── Header + body signature fingerprinting
-```
+[USERNAME] johndoe
+  ✓ GitHub        → github.com/johndoe (joined 2019, 47 repos, last active 3d ago)
+  ✓ Twitter/X     → @johndoe (12k followers, location: "SF")
+  ✓ HackerNews    → johndoe (karma: 4,231)
+  ✓ Reddit        → u/johndoe (5y account, r/netsec regular)
+  ✗ Instagram     → not found
+  ✗ TikTok        → not found
 
----
-
-## 📦 Output
-
-All results saved as structured JSON — pipe into other tools or SIEMs:
-
-```json
-{
-  "target": "example.com",
-  "subdomains": [{"subdomain": "api.example.com", "ip": "93.184.216.35"}],
-  "ports": [{"port": 443, "service": "HTTPS"}],
-  "tech_hints": ["Nginx", "Cloudflare", "React"]
-}
+[EMAIL CORRELATION]
+  johndoe@gmail.com → found in 3 breaches (LinkedIn 2012, Adobe 2013, Dropbox 2012)
+  Associated domains: johndoe.dev (registered 2021, WHOIS matches SF timezone)
 ```
 
 ---
 
-> ⚠️ Use only on domains you own or have authorization to test. Respect rate limits.
+## Ethics
 
-<p align="center">
-  <a href="https://github.com/SRINIVASAN55">SRINIVASAN55</a> ·
-  <a href="https://linkedin.com/in/srinivasan132">LinkedIn</a>
-</p>
+OsintHawk only accesses public information through legitimate channels. Use it for your own accounts, with explicit consent, or for authorized security assessments. Misuse is your responsibility.
+
+---
+
+**Author:** S. Srinivasan · [GitHub](https://github.com/SRINIVASAN55) · [LinkedIn](https://linkedin.com/in/srinivasan132)
